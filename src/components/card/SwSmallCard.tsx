@@ -1,16 +1,24 @@
-import { type FC } from 'react';
+import { useCallback, type FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface SwCardProps {
+interface SwSmallCardProps {
   img?: string;
+  id?: string;
   name: string;
   gender: string;
   birth_year: string;
+  onClick?: () => void;
 }
 
-export const SwCard: FC<SwCardProps> = ({ name, gender, birth_year, img = '' }) => {
+export const SwSmallCard: FC<SwSmallCardProps> = ({
+  name,
+  gender,
+  birth_year,
+  img = '',
+  onClick,
+}) => {
   return (
-    <Card>
+    <Card onClick={onClick}>
       <CardHeader>
         <CardTitle>{name}</CardTitle>
       </CardHeader>

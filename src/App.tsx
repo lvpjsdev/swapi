@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAllPeople, searchPeople } from './api';
-import { SwCard } from './components/card/SwCard';
+import { SwSmallCard, SwFullCard } from './components/card';
 import { Search } from './components/search/Search';
 import { Filter, type Option } from './components/Filter/Filter';
 import { useQuery } from '@tanstack/react-query';
+import { Modal } from './components/Modal/Modal';
+import { usePathnameId } from './lib/hooks';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -15,7 +17,8 @@ const GenderFilterOptions: Option[] = [
 function App() {
   const [search, setSearch] = useState('');
   const [filterValue, setFilterValue] = useState('NO_FILTERS');
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [pathnameId, setPathnameId] = usePathnameId();
   const peopleQuery = useQuery({
     queryKey: ['people', search],
     queryFn: () => (search ? searchPeople(search) : getAllPeople()),
@@ -40,6 +43,23 @@ function App() {
         }) || [];
   }, [peopleQuery.isLoading, filterValue]);
 
+  const selectedPerson = useMemo(() => {
+    if (peopleQuery.isLoading) return null;
+
+    return peopleQuery.data?.results?.find(
+      (person) =>
+        person.properties.url?.split('/').pop() === pathnameId.toString()
+    )?.properties;
+  }, [peopleQuery.isLoading, pathnameId]);
+
+  useEffect(() => {
+    if (pathnameId) {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  }, [pathnameId]);
+
   return (
     <>
       <Search onSearch={setSearch} />
@@ -51,17 +71,32 @@ function App() {
       <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
         {filteredPeople?.map((person) => {
           const { name, gender, birth_year } = person.properties;
-          const id = person.properties.url?.split('/').filter(Boolean).pop();
+          const id =
+            person.properties.url?.split('/').filter(Boolean).pop() || '0';
+
           return (
-            <SwCard
+            <SwSmallCard
               key={id}
               name={name}
               gender={gender}
               birth_year={birth_year}
+              onClick={() => {
+                setPathnameId(Number(id));
+                setIsOpen(true);
+              }}
             />
           );
         })}
       </div>
+      <Modal
+        isOpen={isOpen}
+        onToggle={(isOpen) => {
+          setIsOpen(isOpen);
+          window.history.pushState(null, '', `/`);
+        }}
+      >
+        {<SwFullCard id={pathnameId} person={selectedPerson} />}
+      </Modal>
     </>
   );
 }

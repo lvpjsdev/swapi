@@ -25,6 +25,10 @@ export interface Entity<T> {
   __v: number;
 }
 
+export interface ResponseOne<T> {
+  message: string;
+  result?: T;
+}
 export interface Response<T> {
   message: string;
   total_records: number;

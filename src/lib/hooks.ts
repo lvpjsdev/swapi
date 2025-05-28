@@ -15,3 +15,30 @@ export const useDebounce = <T = unknown>(value: T, delay = 500) => {
 
   return debouncedValue;
 };
+
+export const usePathnameId = (): [number, (id: number) => void] => {
+  const [pathnameId, setPathnameId] = useState(0);
+
+  const changePathnameId = (id: number) => {
+    window.history.pushState({}, '', id ? `/${id}` : '/');
+    window.dispatchEvent(new Event('popstate'));
+    setPathnameId(id);
+  };
+
+  useEffect(() => {
+    const handlePathnameChange = () => {
+      const id = parseInt(window.location.pathname.split('/').pop() || '0');
+      setPathnameId(id);
+    };
+
+    window.addEventListener('popstate', handlePathnameChange);
+    window.addEventListener('load', handlePathnameChange);
+
+    return () => {
+      window.removeEventListener('popstate', handlePathnameChange);
+      window.removeEventListener('load', handlePathnameChange);
+    };
+  }, []);
+
+  return [pathnameId, changePathnameId];
+};
