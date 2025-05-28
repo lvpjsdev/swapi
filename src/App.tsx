@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { getAllPeople, searchPeople } from './api';
 import { SwSmallCard, SwFullCard } from './components/card';
 import { Search } from './components/search/Search';
@@ -22,9 +23,18 @@ function App() {
   const [pathnameId, setPathnameId] = usePathnameId();
   const peopleQuery = useQuery({
     queryKey: ['people', search],
-    queryFn: () => (search ? searchPeople(search) : getAllPeople()),
+    queryFn: async () => {
+      try {
+        return search ? await searchPeople(search) : await getAllPeople();
+      } catch {
+        toast.error('Uh oh! Something went wrong.', {
+          description: 'There was a problem with your request.',
+          closeButton: true,
+        });
+      }
+    },
     select: (data) => {
-      if (data.result) {
+      if (data?.result) {
         return {
           ...data,
           results: data.result,
@@ -71,7 +81,9 @@ function App() {
       />
       <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
         {peopleQuery.isLoading
-          ? Array(10).fill(<SwSkeleton />)
+          ? Array(10)
+              .fill(undefined)
+              .map((_, index) => <SwSkeleton key={index} />)
           : filteredPeople?.map((person) => {
               const { name, gender, birth_year } = person.properties;
               const id =
