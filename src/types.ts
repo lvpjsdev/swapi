@@ -1,24 +1,24 @@
 export interface Person {
-    created: string;
-    edited: string;
-    name: string;
-    gender: string;
-    skin_color: string;
-    hair_color: string;
-    height: string;
-    eye_color: string;
-    mass: string;
-    homeworld: string;
-    birth_year: string;
-    url: string;
+  created: string;
+  edited: string;
+  name: string;
+  gender: string;
+  skin_color: string;
+  hair_color: string;
+  height: string;
+  eye_color: string;
+  mass: string;
+  homeworld: string;
+  birth_year: string;
+  url: string;
 }
 
 export interface Entity<T> {
-    properties: T;
-      _id: string;
-      description: string;
-      uid: string;
-      __v: number;
+  properties: T;
+  _id: string;
+  description: string;
+  uid: string;
+  __v: number;
 }
 
 export interface Response<T> {
@@ -27,5 +27,6 @@ export interface Response<T> {
   total_pages: number;
   previous: string | null;
   next: string | null;
-  results: T[];
+  results?: T[];
+  result?: T[];
 }
