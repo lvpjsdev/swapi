@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getAllPeople, searchPeople } from './api';
-import type { Entity, Person } from './types';
 import { SwCard } from './components/card/SwCard';
 import { Search } from './components/search/Search';
 import { Filter, type Option } from './components/Filter/Filter';
+import { useQuery } from '@tanstack/react-query';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -13,35 +13,32 @@ const GenderFilterOptions: Option[] = [
 ];
 
 function App() {
-  const [people, setPeople] = useState<Entity<Person>[]>([]);
   const [search, setSearch] = useState('');
   const [filterValue, setFilterValue] = useState('NO_FILTERS');
 
-  useEffect(() => {
-    getAllPeople().then((data) => {
-      setPeople(data.results || data.result || []);
-    });
-  }, [setPeople]);
-
-  useEffect(() => {
-    searchPeople(search).then((data) => {
-      console.log('search', search);
-
-      console.log('data', data);
-
-      setPeople(data.results || data.result || []);
-    });
-  }, [search]);
+  const peopleQuery = useQuery({
+    queryKey: ['people', search],
+    queryFn: () => (search ? searchPeople(search) : getAllPeople()),
+    select: (data) => {
+      if (data.result) {
+        return {
+          ...data,
+          results: data.result,
+        };
+      }
+      return data;
+    },
+  });
 
   const filteredPeople = useMemo(() => {
-    return filterValue === 'NO_FILTERS'
-      ? people
-      : people.filter((person) => {
-          return person.properties.gender === filterValue;
-        });
-  }, [people, filterValue]);
+    if (peopleQuery.isLoading) return [];
 
-  console.log(people);
+    return filterValue === 'NO_FILTERS'
+      ? peopleQuery.data?.results
+      : peopleQuery.data?.results?.filter((person) => {
+          return person.properties.gender === filterValue;
+        }) || [];
+  }, [peopleQuery.isLoading, filterValue]);
 
   return (
     <>
