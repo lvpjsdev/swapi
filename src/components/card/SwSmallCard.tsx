@@ -24,10 +24,10 @@ export const SwSmallCard: FC<SwSmallCardProps> = ({
       </CardHeader>
       <CardContent>
         <img src={img} alt={name} width={300} height={300} />
-        <ul>
-          <li>{`gender: ${gender}`}</li>
-          <li>{`birth_year: ${birth_year}`}</li>
-        </ul>
+        <div>
+          <p>{`gender: ${gender}`}</p>
+          <p>{`birth_year: ${birth_year}`}</p>
+        </div>
       </CardContent>
     </Card>
   );

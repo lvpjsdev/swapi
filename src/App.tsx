@@ -6,6 +6,7 @@ import { Filter, type Option } from './components/Filter/Filter';
 import { useQuery } from '@tanstack/react-query';
 import { Modal } from './components/Modal/Modal';
 import { usePathnameId } from './lib/hooks';
+import { SwSkeleton } from './components/SwSkeleton/SwSkeleton';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -69,24 +70,26 @@ function App() {
         setFilter={setFilterValue}
       />
       <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
-        {filteredPeople?.map((person) => {
-          const { name, gender, birth_year } = person.properties;
-          const id =
-            person.properties.url?.split('/').filter(Boolean).pop() || '0';
+        {peopleQuery.isLoading
+          ? Array(10).fill(<SwSkeleton />)
+          : filteredPeople?.map((person) => {
+              const { name, gender, birth_year } = person.properties;
+              const id =
+                person.properties.url?.split('/').filter(Boolean).pop() || '0';
 
-          return (
-            <SwSmallCard
-              key={id}
-              name={name}
-              gender={gender}
-              birth_year={birth_year}
-              onClick={() => {
-                setPathnameId(Number(id));
-                setIsOpen(true);
-              }}
-            />
-          );
-        })}
+              return (
+                <SwSmallCard
+                  key={id}
+                  name={name}
+                  gender={gender}
+                  birth_year={birth_year}
+                  onClick={() => {
+                    setPathnameId(Number(id));
+                    setIsOpen(true);
+                  }}
+                />
+              );
+            })}
       </div>
       <Modal
         isOpen={isOpen}
