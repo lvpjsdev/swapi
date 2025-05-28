@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Modal } from './components/Modal/Modal';
 import { usePathnameId } from './lib/hooks';
 import { SwSkeleton } from './components/SwSkeleton/SwSkeleton';
+import { SwPagination } from './components/SwPagination/SwPagination';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -21,11 +22,15 @@ function App() {
   const [filterValue, setFilterValue] = useState('NO_FILTERS');
   const [isOpen, setIsOpen] = useState(false);
   const [pathnameId, setPathnameId] = usePathnameId();
+  const [page, setPage] = useState(1);
+
   const peopleQuery = useQuery({
-    queryKey: ['people', search],
+    queryKey: ['people', page, search],
     queryFn: async () => {
       try {
-        return search ? await searchPeople(search) : await getAllPeople();
+        return search
+          ? await searchPeople(search, page)
+          : await getAllPeople(page);
       } catch {
         toast.error('Uh oh! Something went wrong.', {
           description: 'There was a problem with your request.',
@@ -45,7 +50,7 @@ function App() {
   });
 
   const filteredPeople = useMemo(() => {
-    if (peopleQuery.isLoading) return [];
+    if (peopleQuery.isPending) return [];
 
     return filterValue === 'NO_FILTERS'
       ? peopleQuery.data?.results
@@ -80,11 +85,13 @@ function App() {
         setFilter={setFilterValue}
       />
       <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
-        {peopleQuery.isLoading
-          ? Array(10)
-              .fill(undefined)
-              .map((_, index) => <SwSkeleton key={index} />)
-          : filteredPeople?.map((person) => {
+        {peopleQuery.isPending ? (
+          Array(10)
+            .fill(undefined)
+            .map((_, index) => <SwSkeleton key={index} />)
+        ) : (
+          <div>
+            {filteredPeople?.map((person) => {
               const { name, gender, birth_year } = person.properties;
               const id =
                 person.properties.url?.split('/').filter(Boolean).pop() || '0';
@@ -102,7 +109,26 @@ function App() {
                 />
               );
             })}
+          </div>
+        )}
       </div>
+      <SwPagination
+        currentPage={page}
+        totalPages={peopleQuery.data?.total_pages || 1}
+        onPageChange={(newPage) => {
+          setPage(newPage);
+        }}
+        onNextPageClick={() => {
+          if (peopleQuery.data?.next) {
+            setPage((prev) => prev + 1);
+          }
+        }}
+        onPreviousPageClick={() => {
+          if (peopleQuery.data?.previous) {
+            setPage((prev) => prev - 1);
+          }
+        }}
+      />
       <Modal
         isOpen={isOpen}
         onToggle={(isOpen) => {
