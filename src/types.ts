@@ -1,3 +1,7 @@
+export type FilterType = Gender;
+
+export type Gender = 'male' | 'female' | 'n/a';
+
 export interface Person {
   created: string;
   edited: string;
