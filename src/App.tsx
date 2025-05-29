@@ -10,6 +10,7 @@ import { usePathnameId } from './lib/hooks';
 import { SwPagination } from './components/SwPagination/SwPagination';
 import { PeopleList } from './components/PeopleList/PeopleList';
 import type { People, Response, Entity, Person } from './types';
+import { Label } from './components/ui/label';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -85,38 +86,46 @@ function App() {
   }, [pathnameId]);
 
   return (
-    <>
-      <Search onSearch={setSearch} />
-      <Filter
-        options={GenderFilterOptions}
-        filterValue={filterValue}
-        setFilter={setFilterValue}
-      />
-
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center p-4'>
+        SW People
+      </h1>
+      <div className='flex flex-col flex-wrap items-stretch justify-between gap-4 mb-4'>
+        <Search onSearch={setSearch} />
+        <Label>
+          Gender:
+          <Filter
+            options={GenderFilterOptions}
+            filterValue={filterValue}
+            setFilter={setFilterValue}
+          />
+        </Label>
+      </div>
       <PeopleList
         people={filteredPeople}
         onPersonCardClick={(id) => {
           setPathnameId(id);
         }}
       />
-
-      <SwPagination
-        currentPage={page}
-        totalPages={peopleQuery.data?.totalPages || 1}
-        onPageChange={(newPage) => {
-          setPage(newPage);
-        }}
-        onNextPageClick={() => {
-          if (peopleQuery.data?.next) {
-            setPage((prev) => prev + 1);
-          }
-        }}
-        onPreviousPageClick={() => {
-          if (peopleQuery.data?.previous) {
-            setPage((prev) => prev - 1);
-          }
-        }}
-      />
+      <div className='pt-8'>
+        <SwPagination
+          currentPage={page}
+          totalPages={peopleQuery.data?.totalPages || 1}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+          }}
+          onNextPageClick={() => {
+            if (peopleQuery.data?.next) {
+              setPage((prev) => prev + 1);
+            }
+          }}
+          onPreviousPageClick={() => {
+            if (peopleQuery.data?.previous) {
+              setPage((prev) => prev - 1);
+            }
+          }}
+        />
+      </div>
       <Modal
         isOpen={isOpen}
         onToggle={(isOpen) => {
@@ -126,7 +135,7 @@ function App() {
       >
         {<SwFullCard id={pathnameId} person={selectedPerson} />}
       </Modal>
-    </>
+    </div>
   );
 }
 

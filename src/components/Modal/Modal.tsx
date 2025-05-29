@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import type { FC } from 'react';
 
@@ -17,7 +18,10 @@ export const Modal: FC<ModalProps> = ({ children, isOpen, onToggle }) => {
     <Dialog open={isOpen} onOpenChange={onToggle}>
       <DialogContent>
         <DialogHeader>
-          <DialogDescription>{children}</DialogDescription>
+          <DialogTitle></DialogTitle>
+          <DialogDescription>
+            <div className='pt-2'>{children}</div>
+          </DialogDescription>
         </DialogHeader>
       </DialogContent>
     </Dialog>

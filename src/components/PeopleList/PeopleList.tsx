@@ -11,7 +11,7 @@ export const PeopleList: React.FC<PeopleListProps> = ({
   onPersonCardClick,
 }) => {
   return (
-    <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
+    <div className='flex flex-row flex-wrap items-center justify-center gap-4'>
       {people?.map((person) => {
         const { name, gender, birth_year, id } = person;
         return (

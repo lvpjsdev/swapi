@@ -24,7 +24,7 @@ export const SwSmallCard: FC<SwSmallCardProps> = ({
         <CardTitle>{name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <img src={img || noImg} alt={name} width={300} height={300} />
+        <img src={img || noImg} alt={name} width={200} height={200} />
         <div>
           <p>{`gender: ${gender}`}</p>
           <p>{`birth_year: ${birth_year}`}</p>
