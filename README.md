@@ -1,54 +1,70 @@
-# React + TypeScript + Vite
+# SWAPI Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Клиентское приложение для работы с Star Wars API (SWAPI). Позволяет просматривать информацию о персонажах вселенной Star Wars, осуществлять поиск и фильтрацию.
 
-Currently, two official plugins are available:
+## Технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19
+- TypeScript
+- Vite
+- TailwindCSS
+- React Query
+- Radix UI
+- Sonner (для уведомлений)
 
-## Expanding the ESLint configuration
+## Требования
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js 18+
+- npm или yarn
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Установка
+
+```bash
+# Клонировать репозиторий
+git clone [url репозитория]
+
+# Перейти в директорию проекта
+cd swapi
+
+# Установить зависимости
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Запуск
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Запуск в режиме разработки
+npm run dev
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+# Сборка проекта
+npm run build
+
+# Предпросмотр собранного проекта
+npm run preview
+```
+
+## Основные возможности
+
+- Просмотр списка персонажей Star Wars
+- Детальная информация о каждом персонаже
+- Поиск персонажей
+- Фильтрация по различным параметрам
+- Пагинация результатов
+- Адаптивный дизайн
+- Современный пользовательский интерфейс с использованием компонентов Radix UI
+
+## Структура проекта
+
+- `src/components` - React компоненты
+- `src/assets` - Статические ресурсы
+- `src/lib` - Утилиты и хуки
+- `src/types` - TypeScript типы
+- `src/api.ts` - API клиент для работы с SWAPI
+
+## Разработка
+
+Проект использует ESLint для проверки кода. Для запуска линтера используйте:
+
+```bash
+npm run lint
 ```
