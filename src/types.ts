@@ -2,6 +2,7 @@ export type FilterType = Gender;
 
 export type Gender = 'male' | 'female' | 'n/a';
 
+export type People = (Person & { id: string })[];
 export interface Person {
   created: string;
   edited: string;

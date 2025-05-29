@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { getAllPeople, searchPeople } from './api';
-import { SwSmallCard, SwFullCard } from './components/card';
+import { SwFullCard } from './components/card';
 import { Search } from './components/search/Search';
 import { Filter, type Option } from './components/Filter/Filter';
 import { useQuery } from '@tanstack/react-query';
 import { Modal } from './components/Modal/Modal';
 import { usePathnameId } from './lib/hooks';
-import { SwSkeleton } from './components/SwSkeleton/SwSkeleton';
 import { SwPagination } from './components/SwPagination/SwPagination';
+import { PeopleList } from './components/PeopleList/PeopleList';
+import type { People, Response, Entity, Person } from './types';
 
 const GenderFilterOptions: Option[] = [
   { name: 'All', value: 'NO_FILTERS' },
@@ -24,48 +25,55 @@ function App() {
   const [pathnameId, setPathnameId] = usePathnameId();
   const [page, setPage] = useState(1);
 
-  const peopleQuery = useQuery({
+  const peopleQuery = useQuery<
+    Response<Entity<Person>>,
+    unknown,
+    { results: People; totalPages: number; next: string; previous: string }
+  >({
     queryKey: ['people', page, search],
     queryFn: async () => {
       try {
         return search
           ? await searchPeople(search, page)
           : await getAllPeople(page);
-      } catch {
+      } catch (error) {
         toast.error('Uh oh! Something went wrong.', {
           description: 'There was a problem with your request.',
           closeButton: true,
         });
+        throw error;
       }
     },
     select: (data) => {
-      if (data?.result) {
-        return {
-          ...data,
-          results: data.result,
-        };
-      }
-      return data;
+      return {
+        results: (data?.results || data?.result || []).map((item) => ({
+          ...item.properties,
+          id: item.uid || item._id,
+        })),
+        totalPages: data?.total_pages || 1,
+        next: data?.next || '',
+        previous: data?.previous || '',
+      };
     },
   });
 
   const filteredPeople = useMemo(() => {
     if (peopleQuery.isPending) return [];
 
+    const results = peopleQuery.data?.results || [];
     return filterValue === 'NO_FILTERS'
-      ? peopleQuery.data?.results
-      : peopleQuery.data?.results?.filter((person) => {
-          return person.properties.gender === filterValue;
-        }) || [];
-  }, [peopleQuery.isLoading, filterValue]);
+      ? results
+      : results.filter((person) => {
+          return person.gender === filterValue;
+        });
+  }, [peopleQuery.isPending, filterValue, peopleQuery.data?.results]);
 
   const selectedPerson = useMemo(() => {
-    if (peopleQuery.isLoading) return null;
+    if (peopleQuery.isPending) return null;
 
     return peopleQuery.data?.results?.find(
-      (person) =>
-        person.properties.url?.split('/').pop() === pathnameId.toString()
-    )?.properties;
+      (person) => person.url?.split('/').pop() === pathnameId.toString()
+    );
   }, [peopleQuery.isLoading, pathnameId]);
 
   useEffect(() => {
@@ -84,37 +92,17 @@ function App() {
         filterValue={filterValue}
         setFilter={setFilterValue}
       />
-      <div className='flex flex-row flex-wrap items-center justify-center min-h-svh gap-4'>
-        {peopleQuery.isPending ? (
-          Array(10)
-            .fill(undefined)
-            .map((_, index) => <SwSkeleton key={index} />)
-        ) : (
-          <div>
-            {filteredPeople?.map((person) => {
-              const { name, gender, birth_year } = person.properties;
-              const id =
-                person.properties.url?.split('/').filter(Boolean).pop() || '0';
 
-              return (
-                <SwSmallCard
-                  key={id}
-                  name={name}
-                  gender={gender}
-                  birth_year={birth_year}
-                  onClick={() => {
-                    setPathnameId(Number(id));
-                    setIsOpen(true);
-                  }}
-                />
-              );
-            })}
-          </div>
-        )}
-      </div>
+      <PeopleList
+        people={filteredPeople}
+        onPersonCardClick={(id) => {
+          setPathnameId(id);
+        }}
+      />
+
       <SwPagination
         currentPage={page}
-        totalPages={peopleQuery.data?.total_pages || 1}
+        totalPages={peopleQuery.data?.totalPages || 1}
         onPageChange={(newPage) => {
           setPage(newPage);
         }}
@@ -133,7 +121,7 @@ function App() {
         isOpen={isOpen}
         onToggle={(isOpen) => {
           setIsOpen(isOpen);
-          window.history.pushState(null, '', `/`);
+          setPathnameId(0);
         }}
       >
         {<SwFullCard id={pathnameId} person={selectedPerson} />}
