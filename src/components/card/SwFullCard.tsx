@@ -5,6 +5,7 @@ import { getPerson } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import { SwSkeleton } from '../SwSkeleton/SwSkeleton';
 import noImg from '../../assets/no-img.png';
+import { toast } from 'sonner';
 
 interface SwFullCardProps {
   id: number;
@@ -15,7 +16,17 @@ interface SwFullCardProps {
 export const SwFullCard: FC<SwFullCardProps> = ({ id, person, img }) => {
   const personQuery = useQuery({
     queryKey: ['person', id],
-    queryFn: () => getPerson(id),
+    queryFn: async () => {
+      try {
+        return await getPerson(id);
+      } catch (error) {
+        toast.error('Uh oh! Something went wrong.', {
+          description: 'There was a problem with your request.',
+          closeButton: true,
+        });
+        throw error;
+      }
+    },
     select: (data) => data.result?.properties as Person,
     enabled: !person && id > 0,
   });
@@ -24,7 +35,7 @@ export const SwFullCard: FC<SwFullCardProps> = ({ id, person, img }) => {
 
   return (
     <Card>
-      {personQuery.isLoading ? (
+      {personQuery.isPending ? (
         <SwSkeleton type='full' />
       ) : (
         <>
