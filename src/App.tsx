@@ -106,6 +106,7 @@ function App() {
         onPersonCardClick={(id) => {
           setPathnameId(id);
         }}
+        isLoading={peopleQuery.isPending}
       />
       <div className='pt-8'>
         <SwPagination
