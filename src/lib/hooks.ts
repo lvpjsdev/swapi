@@ -20,7 +20,7 @@ export const usePathnameId = (): [number, (id: number) => void] => {
   const [pathnameId, setPathnameId] = useState(0);
 
   const changePathnameId = (id: number) => {
-    window.history.pushState({}, '', id ? `/${id}` : '/');
+    window.history.pushState({}, '', id != 0 ? `/${id}` : '/');
     window.dispatchEvent(new Event('popstate'));
     setPathnameId(id);
   };

@@ -1,5 +1,6 @@
-import { useCallback, type FC } from 'react';
+import { type FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import noImg from '../../assets/no-img.png';
 
 interface SwSmallCardProps {
   img?: string;
@@ -14,7 +15,7 @@ export const SwSmallCard: FC<SwSmallCardProps> = ({
   name,
   gender,
   birth_year,
-  img = '',
+  img,
   onClick,
 }) => {
   return (
@@ -23,7 +24,7 @@ export const SwSmallCard: FC<SwSmallCardProps> = ({
         <CardTitle>{name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <img src={img} alt={name} width={300} height={300} />
+        <img src={img || noImg} alt={name} width={300} height={300} />
         <div>
           <p>{`gender: ${gender}`}</p>
           <p>{`birth_year: ${birth_year}`}</p>
