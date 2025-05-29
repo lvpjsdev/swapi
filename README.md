@@ -4,7 +4,7 @@
 
 ## Demo
 
-Рабочее приложение можно посмотреть по адресу (swapi-ebon.vercel.app)[swapi-ebon.vercel.app]
+Рабочее приложение можно посмотреть по адресу [https://swapi-ebon.vercel.app/](https://swapi-ebon.vercel.app/)
 
 ## Технологии
 
